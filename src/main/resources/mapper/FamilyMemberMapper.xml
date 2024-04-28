@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.springboot.learning.mapper.FamilyMemberMapper">
+    <!--    <resultMap type="com.example.dynamicsql.entity.User" id="UserResult">-->
+    <!--        <result property="id" column="id"/>-->
+    <!--        <result property="username" column="username"/>-->
+    <!--        <result property="password" column="password"/>-->
+    <!--        <result property="sex" column="sex"/>-->
+    <!--        <result property="age" column="age"/>-->
+    <!--        <result property="phone" column="phone"/>-->
+    <!--        <result property="address" column="address"/>-->
+    <!--    </resultMap>-->
+
+    <select id="findAllMembers" resultType="com.springboot.learning.entity.FamilyMember">
+        select member_id    memberId,
+               member_name  memberName,
+               age,
+               phone_number phoneNumber,
+               hobby,
+               create_date  createDate,
+               create_by    createBy,
+               update_date  updateDate,
+               update_by    updateBy
+        from mydatabase.family_member
+    </select>
+
+    <insert id="insertFamilyMember" useGeneratedKeys="true" keyProperty="familyMember.memberId">
+        insert into mydatabase.family_member (member_name, age, phone_number, hobby, create_date, create_by,
+                                              update_date, update_by)
+        values (#{familyMember.memberName, jdbcType = VARCHAR},
+                #{familyMember.age, jdbcType = INTEGER},
+                #{familyMember.phoneNumber, jdbcType = VARCHAR},
+                #{familyMember.hobby, jdbcType = VARCHAR},
+                sysdate(),
+                #{familyMember.createBy, jdbcType = VARCHAR},
+                sysdate(),
+                #{familyMember.updateBy, jdbcType = VARCHAR})
+    </insert>
+
+    <update id="updateFamilyMember" parameterType="com.springboot.learning.entity.FamilyMember">
+        update
+            mydatabase.family_member
+        set
+            <if test='familyMember != null and familyMember.memberName != null and familyMember.memberName != ""'>
+                member_name = #{familyMember.memberName, jdbcType = VARCHAR},
+            </if>
+            <if test='familyMember != null and familyMember.age > 0'>
+                age = #{familyMember.age, jdbcType = INTEGER},
+            </if>
+            <if test='familyMember != null and familyMember.phoneNumber != null and familyMember.phoneNumber != ""'>
+                phone_number = #{familyMember.phoneNumber, jdbcType = VARCHAR},
+            </if>
+            <if test='familyMember != null and familyMember.hobby != null and familyMember.hobby != ""'>
+                hobby = #{familyMember.hobby, jdbcType = VARCHAR},
+            </if>
+            <if test='familyMember != null and familyMember.updateBy != null and familyMember.updateBy != ""'>
+                update_by = #{familyMember.updateBy, jdbcType = VARCHAR},
+            </if>
+            update_date = sysdate()
+        where
+            member_id = #{familyMember.memberId, jdbcType = BIGINT}
+    </update>
+</mapper>
