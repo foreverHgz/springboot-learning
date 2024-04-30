@@ -5,6 +5,9 @@ import java.util.Date;
 
 import lombok.Data;
 
+/**
+ * @author forever_hgz
+ */
 @Data
 public class FamilyMember implements Serializable {
     private long memberId;
