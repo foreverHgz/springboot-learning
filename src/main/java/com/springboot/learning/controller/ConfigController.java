@@ -15,7 +15,7 @@ public class ConfigController {
     @Value("${lastName}")
     private String lastName;
 
-    @GetMapping()
+    @GetMapping("/getName")
     public String getName() {
         return "My name is:" + firstName + lastName;
     }
