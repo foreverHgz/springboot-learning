@@ -85,6 +85,18 @@
 			<artifactId>spring-cloud-starter-config</artifactId>
 		</dependency>
 
+		<!--actuator提供端点触发更新-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<!--Eureka Client配置中心依赖-->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+
 		<!--		<dependency>-->
 <!--			<groupId>org.apache.shardingsphere</groupId>-->
 <!--			<artifactId>sharding-jdbc-spring-boot-starter</artifactId>-->

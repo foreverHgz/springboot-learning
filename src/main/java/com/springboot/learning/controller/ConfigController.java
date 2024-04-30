@@ -1,22 +1,42 @@
 package com.springboot.learning.controller;
 
+import com.springboot.learning.bean.Person;
+import com.springboot.learning.bean.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * @author forever_hgz
  */
 @RestController
 public class ConfigController {
-    @Value("${firstName}")
-    private String firstName;
+    @Value("${second.config.person.country}")
+    private String country;
 
-    @Value("${lastName}")
-    private String lastName;
+    @Value("${second.config.person.age}")
+    private int age;
 
-    @GetMapping("/getName")
-    public String getName() {
-        return "My name is:" + firstName + lastName;
+    @Resource
+    private User user;
+
+    @Resource
+    private Person person;
+
+    @GetMapping("/getName1")
+    public String getName1() {
+        return "My name is:" + user.getFirstName() + user.getLastName();
+    }
+
+    @GetMapping("/getName2")
+    public String getName2() {
+        return "My name is:" + person.getFirstName() + person.getLastName();
+    }
+
+    @GetMapping("/getName3")
+    public String getName3() {
+        return "My name is:" + country + age;
     }
 }
