@@ -3,6 +3,7 @@ package com.redis.hgz.redis;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,7 +20,7 @@ import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class YouEnExcelTest {
+class YouEnExcelTest {
     private static final String BASE_PATH = "D:\\youen";
 
     private static final String SEPARATOR = "\\";
@@ -29,20 +30,39 @@ public class YouEnExcelTest {
     private static final String SUFFIX = ".xlsx";
 
     @Test
-    public void synchronousRead() {
+    void synchronousRead() {
         String fileName = BASE_PATH + SEPARATOR + READ_FILE_NAME;
 
         // 这里 也可以不指定class，返回一个list，然后读取第一个sheet 同步读取会自动finish
-        List<Map<Integer, String>> allReadData = EasyExcel.read(fileName).sheet().headRowNumber(2).doReadSync();
+        List<Map<Integer, String>> allReadData = EasyExcel.read(fileName).sheet().headRowNumber(0).doReadSync();
+        if (CollectionUtils.isEmpty(allReadData)) {
+            return;
+        }
+        Iterator<Map<Integer, String>> iterator = allReadData.iterator();
+        while (iterator.hasNext()) {
+            Map<Integer, String> nextRow = iterator.next();
+            if ("单据日期".equals(nextRow.get(0))) {
+                break;
+            }
+            iterator.remove();
+        }
         if (CollectionUtils.isEmpty(allReadData)) {
             return;
         }
         Map<Integer, String> title = allReadData.get(0);
         allReadData.remove(0);
-        List<String> dates = allReadData.stream().map(item -> item.get(0).substring(0, item.get(0).lastIndexOf("/")))
-            .distinct().collect(Collectors.toList());
         List<Map<Integer, String>> allReadDataCopy = copy(allReadData);
-        writeFile(allReadDataCopy, title, dates.get(0).replaceAll("/", "年") + "月");
+        List<String> dates;
+        boolean isSlashSeparate = allReadData.get(0).get(0).contains("/");
+        if (isSlashSeparate) {
+            dates = allReadData.stream().map(item -> item.get(0).substring(0, item.get(0).lastIndexOf("/"))).distinct()
+                .collect(Collectors.toList());
+            writeFile(allReadDataCopy, title, dates.get(0).replaceAll("/", "年") + "月");
+        } else {
+            dates = allReadData.stream().map(item -> item.get(0).substring(0, item.get(0).lastIndexOf("-"))).distinct()
+                .collect(Collectors.toList());
+            writeFile(allReadDataCopy, title, dates.get(0).replaceAll("-", "年") + "月");
+        }
         List<String> dateTos = new ArrayList<>();
 
         for (int i = 0; i < dates.size() - 1; i++) {
@@ -52,7 +72,11 @@ public class YouEnExcelTest {
             for (String dateTo : dateTos) {
                 allReadDataCopy.removeIf(integerStringMap -> integerStringMap.get(0).startsWith(dateTo));
             }
-            writeFile(allReadDataCopy, title, dates.get(i + 1).replaceAll("/", "年") + "月");
+            if (isSlashSeparate) {
+                writeFile(allReadDataCopy, title, dates.get(i + 1).replaceAll("/", "年") + "月");
+            } else {
+                writeFile(allReadDataCopy, title, dates.get(i + 1).replaceAll("-", "年") + "月");
+            }
         }
     }
 
